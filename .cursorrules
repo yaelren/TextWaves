@@ -1,0 +1,118 @@
+# Chatooly Development Rules - ALWAYS FOLLOW THESE
+
+## 🚨 MANDATORY CHECKS - RUN AFTER EVERY CHANGE
+
+Before completing ANY styling change, you MUST:
+1. ✅ Check live CSS variables: https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/variables.css
+2. ✅ Check available components: https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/components.css
+3. ✅ Verify base styles: https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/base.css
+4. ✅ Check layout classes: https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/layouts/sidebar.css
+5. ✅ Confirm export button is present and functional
+6. ✅ Test that #chatooly-canvas container works
+
+## CRITICAL: After EVERY change, verify these rules are followed:
+
+### 1. EXPORT CONTAINER RULE (MOST IMPORTANT)
+- ALL visual content MUST be inside `<div id="chatooly-canvas">` 
+- NEVER create visual elements outside this container
+- NEVER rename or remove the #chatooly-canvas ID
+
+### 2. CDN SCRIPT RULE
+- NEVER modify or remove: `<script src="https://yaelren.github.io/chatooly-cdn/js/core.min.js"></script>`
+- This script handles all export and publishing functionality
+- Auto-updates when CDN is updated
+
+### 3. EXPORT BUTTON RULE
+- NEVER create your own export button
+- The Chatooly CDN automatically adds the export button
+- Button position is controlled by `buttonPosition` in chatooly-config.js
+
+### 4. CANVAS SIZE RULE
+- Visual area must be at least 800x600px
+- Ensure responsive design works on mobile
+
+### 5. FILE EDITING RULES
+You CAN edit:
+- index.html (add controls and content INSIDE #chatooly-canvas)
+- styles.css (only sections marked "EDIT THIS SECTION")
+- js/main.js (all tool logic)
+- js/chatooly-config.js (tool metadata)
+
+You CANNOT edit:
+- The CDN script tag
+- The base layout structure
+- Core CSS layout styles
+- The #chatooly-canvas container ID
+
+### 6. LIBRARY INTEGRATION RULES
+When using external libraries:
+
+For p5.js:
+```javascript
+function setup() {
+    let canvas = createCanvas(800, 600);
+    canvas.parent('chatooly-canvas'); // CRITICAL: Attach to export container
+}
+```
+
+For Three.js:
+```javascript
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(800, 600);
+document.getElementById('chatooly-canvas').appendChild(renderer.domElement);
+```
+
+For regular canvas:
+```javascript
+const canvas = document.createElement('canvas');
+canvas.width = 800;
+canvas.height = 600;
+document.getElementById('chatooly-canvas').appendChild(canvas);
+```
+
+### 7. VERIFICATION CHECKLIST
+After EVERY code change, verify:
+✓ All visual content is inside #chatooly-canvas
+✓ CDN script is intact and loading
+✓ Export button appears in correct position
+✓ Tool exports properly when button is clicked
+✓ No JavaScript errors in console
+✓ Tool works on mobile devices
+
+### 8. TESTING COMMAND
+Always test with: `npm run dev` and check http://localhost:8000
+
+### 9. COMMON MISTAKES TO AVOID
+❌ Creating visual elements outside #chatooly-canvas
+❌ Adding custom export buttons
+❌ Modifying the CDN script
+❌ Changing the #chatooly-canvas ID
+❌ Forgetting to attach canvases to the export container
+
+## 🔄 AFTER EVERY CHANGE - TELL THE USER
+
+Always remind the user:
+"✅ This change follows Chatooly design system using [specify which CSS variables/classes used]. Your tool will automatically get future CDN updates and maintains full export functionality."
+
+## 🚫 WHEN USER WANTS "CUSTOM" STYLING
+
+Always respond with:
+"I'll implement this using Chatooly's design system components and variables. This ensures your tool automatically gets updates and maintains export functionality. Let me check the available options..."
+
+Then check the CSS files above before implementing.
+
+## 🛡️ NEVER ALLOWED
+- ❌ Custom CSS that overrides Chatooly design system  
+- ❌ Hardcoded colors/fonts/spacing (use CSS variables)
+- ❌ Removing or modifying CDN script tags
+- ❌ Custom styling that breaks export functionality
+- ❌ Layout changes that don't use Chatooly classes
+
+## 🎯 ALWAYS USE
+- ✅ `var(--chatooly-color-primary)` instead of `#007bff`
+- ✅ `var(--chatooly-spacing-4)` instead of `16px` 
+- ✅ `.chatooly-btn` instead of custom button styles
+- ✅ `.chatooly-control-group` for form sections
+- ✅ `#chatooly-canvas` for the main canvas element
+
+## REMINDER: Read START_HERE.md for full implementation details

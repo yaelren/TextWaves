@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+    Chatooly Tool Template
+    Author: Yael Renous - Studio Video
+    
+    🤖 AI AGENTS: Before modifying this file, ALWAYS check:
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/variables.css
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/components.css
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/base.css
+    - Ensure CDN script tag remains: https://yaelren.github.io/chatooly-cdn/js/core.min.js
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ========== EDIT THIS: Your Tool Name ========== -->
+    <title>Tool Name - Chatooly</title>
+    
+    <!-- ========== DO NOT EDIT: Required CDN Styles ========== -->
+    <link rel="stylesheet" href="https://yaelren.github.io/chatooly-cdn/css/unified.min.css">
+</head>
+<body>
+    <!-- ========== EDIT THIS: Update header title to match your tool ========== -->
+    <header class="chatooly-header">
+        <div class="chatooly-header-title">Tool Name</div>
+        <div class="chatooly-header-credit">MADE BY CHATOOLY</div>
+    </header>
+
+    <div class="chatooly-app-container">
+        <!-- Left Panel: Tool Controls -->
+        <div class="chatooly-controls-panel">
+            <!-- ========== EDIT THIS: Tool Description ========== -->
+            <div class="chatooly-controls-header">
+                <p>Tool description goes here</p>
+            </div>
+            
+            <div class="chatooly-controls-content">
+                <!-- ========== EDIT BELOW: Add Your Tool Controls Here ========== -->
+                
+                <!-- Example control group -->
+                <div class="chatooly-control-group">
+                    <label for="example-input">Example Control</label>
+                    <input type="text" id="example-input" placeholder="Add your controls here">
+                </div>
+                
+                <!-- Add more controls as needed -->
+                
+                <!-- ========== END EDIT SECTION ========== -->
+            </div>
+        </div>
+        
+        <!-- Right Panel: Preview/Canvas Area -->
+        <div class="chatooly-preview-panel">
+            <!-- ========== DO NOT EDIT: Required Export Container ========== -->
+            <div id="chatooly-container">
+                <!-- ========== EDIT BELOW: Add Your Visual Output Here ========== -->
+                <!-- This content will be exported as PNG/Video -->
+                <!-- IMPORTANT: Your main canvas MUST have id="chatooly-canvas" -->
+                <!-- For animations: CDN automatically detects canvas animations and provides video export options -->
+                <canvas id="chatooly-canvas"></canvas>
+                <!-- ========== END EDIT SECTION ========== -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========== DO NOT EDIT: Chatooly CDN v2.0 Integration ========== -->
+    <!-- This script automatically provides: Dark theme styling + Static/Video export functionality -->
+    <!-- Video support: Detects p5.js, Three.js, Canvas animations and provides MediaRecorder API export -->
+    <script src="https://yaelren.github.io/chatooly-cdn/js/core.min.js"></script>
+    
+    <!-- ========== DO NOT EDIT: Chatooly Configuration ========== -->
+    <script src="js/chatooly-config.js"></script>
+    
+    <!-- ========== DO NOT EDIT: Your Tool Logic ========== -->
+    <script src="js/main.js"></script>
+</body>
+</html>

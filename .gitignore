@@ -1,0 +1,36 @@
+# Chatooly Tool Template - Git Ignore
+# Author: Yael Renous - Studio Video
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js (if user adds dependencies)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Local development
+.env
+.env.local
+
+# Template development files
+template-dev/

@@ -1,0 +1,10 @@
+{
+  "name": "chatooly-tool-template",
+  "version": "1.0.0",
+  "description": "Template for creating Chatooly design tools",
+  "author": "Yael Renous - Studio Video",
+  "scripts": {
+    "dev": "node scripts/dev-server.js"
+  },
+  "license": "MIT"
+}
