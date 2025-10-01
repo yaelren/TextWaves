@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+    Chatooly Tool Template
+    Author: Yael Renous - Studio Video
+    
+    🤖 AI AGENTS: Before modifying this file, ALWAYS check:
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/variables.css
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/components.css
+    - https://raw.githubusercontent.com/yaelren/chatooly-cdn/main/css/base.css
+    - Ensure CDN script tag remains: https://yaelren.github.io/chatooly-cdn/js/core.min.js
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ========== EDIT THIS: Your Tool Name ========== -->
+    <title>Text Waves - Chatooly</title>
+    
+    <!-- ========== DO NOT EDIT: Required CDN Styles ========== -->
+    <link rel="stylesheet" href="https://yaelren.github.io/chatooly-cdn/css/unified.min.css">
+</head>
+<body>
+    <!-- ========== EDIT THIS: Update header title to match your tool ========== -->
+    <header class="chatooly-header">
+        <div class="chatooly-header-title">Text Waves</div>
+        <div class="chatooly-header-credit">MADE BY STUDIO VIDEO</div>
+    </header>
+
+    <div class="chatooly-app-container">
+        <!-- Left Panel: Tool Controls -->
+        <div class="chatooly-controls-panel">
+            <!-- ========== EDIT THIS: Tool Description ========== -->
+            <div class="chatooly-controls-header">
+                <p>Create animated text flowing along customizable wave patterns. Control wave types, amplitude, speed, and styling.</p>
+            </div>
+
+            <div class="chatooly-controls-content">
+                <!-- Text Settings -->
+                <div class="chatooly-control-group">
+                    <label for="text-input">Text Content</label>
+                    <textarea id="text-input" rows="3" placeholder="Enter your text here...">WAVE TEXT ANIMATION</textarea>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="split-mode">Split Mode</label>
+                    <select id="split-mode">
+                        <option value="character">Character</option>
+                        <option value="word">Word</option>
+                        <option value="sentence">Sentence</option>
+                    </select>
+                </div>
+
+                <!-- Wave Settings -->
+                <h3>X-Axis Wave</h3>
+
+                <div class="chatooly-control-group">
+                    <label for="wave-type-x">Wave Type</label>
+                    <select id="wave-type-x">
+                        <option value="sine" selected>Sine</option>
+                        <option value="cosine">Cosine</option>
+                        <option value="tangent">Tangent</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="amplitude-x">Amplitude (px)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="amplitude-x" min="0" max="1000" value="50" style="flex: 1;">
+                        <input type="number" id="amplitude-x-input" min="0" value="50" style="width: 70px;">
+                    </div>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="speed-x">Speed (x)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="speed-x" min="0" max="20" step="0.1" value="1" style="flex: 1;">
+                        <input type="number" id="speed-x-input" min="0" step="0.1" value="1" style="width: 70px;">
+                    </div>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="frequency-x">Frequency</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="frequency-x" min="0.001" max="1" step="0.001" value="0.02" style="flex: 1;">
+                        <input type="number" id="frequency-x-input" min="0" step="0.001" value="0.02" style="width: 70px;">
+                    </div>
+                </div>
+
+                <h3>Y-Axis Wave</h3>
+
+                <div class="chatooly-control-group">
+                    <label for="wave-type-y">Wave Type</label>
+                    <select id="wave-type-y">
+                        <option value="sine" selected>Sine</option>
+                        <option value="cosine">Cosine</option>
+                        <option value="tangent">Tangent</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="amplitude-y">Amplitude (px)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="amplitude-y" min="0" max="1000" value="50" style="flex: 1;">
+                        <input type="number" id="amplitude-y-input" min="0" value="50" style="width: 70px;">
+                    </div>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="speed-y">Speed (x)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="speed-y" min="0" max="20" step="0.1" value="1" style="flex: 1;">
+                        <input type="number" id="speed-y-input" min="0" step="0.1" value="1" style="width: 70px;">
+                    </div>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="frequency-y">Frequency</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="frequency-y" min="0.001" max="1" step="0.001" value="0.02" style="flex: 1;">
+                        <input type="number" id="frequency-y-input" min="0" step="0.001" value="0.02" style="width: 70px;">
+                    </div>
+                </div>
+
+                <h3>General Settings</h3>
+
+                <div class="chatooly-control-group">
+                    <label for="repetitions">Text Repetitions: <span id="repetitions-value">3</span></label>
+                    <input type="range" id="repetitions" min="1" max="10" value="3">
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label>
+                        <input type="checkbox" id="rotate-text" checked> Rotate text along wave
+                    </label>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="direction">Movement Direction</label>
+                    <select id="direction">
+                        <option value="right">Right →</option>
+                        <option value="left">Left ←</option>
+                        <option value="none">None (Static)</option>
+                    </select>
+                </div>
+
+                <h3>Wave Visualization</h3>
+
+                <div class="chatooly-control-group">
+                    <label>
+                        <input type="checkbox" id="show-wave-path"> Show wave path
+                    </label>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="wave-shape">Wave Marker Shape</label>
+                    <select id="wave-shape">
+                        <option value="circle">Circle</option>
+                        <option value="square">Square</option>
+                        <option value="cross">Cross</option>
+                        <option value="rhombus">Rhombus</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="wave-color">Wave Color</label>
+                    <input type="color" id="wave-color" value="#ff00ff">
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="wave-marker-size">Marker Size (px)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="wave-marker-size" min="2" max="100" value="5" style="flex: 1;">
+                        <input type="number" id="wave-marker-size-input" min="2" value="5" style="width: 70px;">
+                    </div>
+                </div>
+
+                <!-- Styling -->
+                <h3>Styling</h3>
+
+                <div class="chatooly-control-group">
+                    <label>Text Colors</label>
+                    <div id="text-colors-container"></div>
+                    <button id="add-color-btn" type="button" style="margin-top: 8px; width: 100%;">+ Add Color</button>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="blend-mode">Blend Mode</label>
+                    <select id="blend-mode">
+                        <option value="source-over">Normal</option>
+                        <option value="multiply">Multiply</option>
+                        <option value="screen">Screen</option>
+                        <option value="overlay">Overlay</option>
+                        <option value="darken">Darken</option>
+                        <option value="lighten">Lighten</option>
+                        <option value="color-dodge">Color Dodge</option>
+                        <option value="color-burn">Color Burn</option>
+                        <option value="hard-light">Hard Light</option>
+                        <option value="soft-light">Soft Light</option>
+                        <option value="difference">Difference</option>
+                        <option value="exclusion">Exclusion</option>
+                        <option value="hue">Hue</option>
+                        <option value="saturation">Saturation</option>
+                        <option value="color">Color</option>
+                        <option value="luminosity">Luminosity</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="font-family">Font Family</label>
+                    <select id="font-family">
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Impact">Impact</option>
+                        <option value="Comic Sans MS">Comic Sans MS</option>
+                        <option value="Trebuchet MS">Trebuchet MS</option>
+                        <option value="Arial Black">Arial Black</option>
+                        <option value="Palatino">Palatino</option>
+                        <option value="Garamond">Garamond</option>
+                        <option value="Bookman">Bookman</option>
+                        <option value="Monaco">Monaco</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="font-size">Font Size (px)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="font-size" min="12" max="500" value="24" style="flex: 1;">
+                        <input type="number" id="font-size-input" min="12" value="24" style="width: 70px;">
+                    </div>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="bg-color">Background Color</label>
+                    <input type="color" id="bg-color" value="#000000">
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="bg-image">Background Image</label>
+                    <input type="file" id="bg-image" accept="image/*">
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="bg-fit">Background Fit</label>
+                    <select id="bg-fit">
+                        <option value="cover">Cover (Fill)</option>
+                        <option value="contain">Contain (Fit)</option>
+                        <option value="fill">Fill (Stretch)</option>
+                    </select>
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="segment-icon">Segment End Icon/Image</label>
+                    <input type="file" id="segment-icon" accept="image/*,.gif">
+                </div>
+
+                <div class="chatooly-control-group">
+                    <label for="icon-size">Icon Size (px)</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="range" id="icon-size" min="10" max="500" value="20" style="flex: 1;">
+                        <input type="number" id="icon-size-input" min="10" value="20" style="width: 70px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel: Preview/Canvas Area -->
+        <div class="chatooly-preview-panel">
+            <!-- ========== DO NOT EDIT: Required Export Container ========== -->
+            <div id="chatooly-container">
+                <!-- ========== EDIT BELOW: Add Your Visual Output Here ========== -->
+                <!-- This content will be exported as PNG/Video -->
+                <!-- IMPORTANT: Your main canvas MUST have id="chatooly-canvas" -->
+                <!-- For animations: CDN automatically detects canvas animations and provides video export options -->
+                <canvas id="chatooly-canvas"></canvas>
+                <!-- ========== END EDIT SECTION ========== -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- ========== DO NOT EDIT: Chatooly CDN v2.0 Integration ========== -->
+    <!-- This script automatically provides: Dark theme styling + Static/Video export functionality -->
+    <!-- Video support: Detects p5.js, Three.js, Canvas animations and provides MediaRecorder API export -->
+    <script src="https://yaelren.github.io/chatooly-cdn/js/core.min.js"></script>
+    
+    <!-- ========== DO NOT EDIT: Chatooly Configuration ========== -->
+    <script src="js/chatooly-config.js"></script>
+    
+    <!-- ========== DO NOT EDIT: Your Tool Logic ========== -->
+    <script src="js/main.js"></script>
+
+    <style>
+        .color-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .color-item input[type="color"] {
+            flex: 1;
+        }
+
+        .color-item button {
+            width: auto;
+            padding: 4px 12px;
+            background: var(--chatooly-color-error, #ff4444);
+        }
+
+        .color-item button:hover {
+            background: var(--chatooly-color-error-hover, #ff6666);
+        }
+    </style>
+</body>
+</html>

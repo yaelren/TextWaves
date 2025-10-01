@@ -74,18 +74,18 @@ const tool = {
     splitMode: 'character',
     waveTypeX: 'sine',
     waveTypeY: 'sine',
-    amplitudeX: 50,
+    amplitudeX: 100,
     amplitudeY: 50,
-    frequencyX: 0.02,
+    frequencyX: 0.01,
     frequencyY: 0.02,
     speedX: 1,
     speedY: 1,
     repetitions: 3,
-    textColors: ['#ffffff', '#ff00ff', '#00ffff'], // Array of colors
+    textColors: ['#D9F20C'], // Neon yellow from palette
     blendMode: 'source-over',
-    fontFamily: 'Arial',
-    fontSize: 24,
-    bgColor: '#000000',
+    fontFamily: 'Wix Madefor Display',
+    fontSize: 19,
+    bgColor: '#0F0E54', // Navy blue from palette
     bgTransparent: false,
     bgImage: null,
     bgFit: 'cover',
@@ -399,6 +399,10 @@ function renderColorInputs() {
 
 // Initialize color inputs
 renderColorInputs();
+
+// Apply infinity preset on load
+document.getElementById('pattern-preset').value = 'infinity';
+applyPreset('infinity');
 
 // Add color button
 document.getElementById('add-color-btn').addEventListener('click', () => {
