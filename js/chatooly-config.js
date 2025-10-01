@@ -6,16 +6,16 @@
 // ========== EDIT THIS: Chatooly Configuration ==========
 window.ChatoolyConfig = {
     // REQUIRED: Your tool name
-    name: "",  // e.g., "my-awesome-tool"
-    
+    name: "text-waves",
+
     // OPTIONAL: Export settings
     resolution: 2,              // 1, 2, or 4
     buttonPosition: "bottom-right",
-    
+
     // REQUIRED FOR PUBLISHING: Tool metadata
-    category: "",     // Choose one: "generators", "visualizers", "editors", "utilities", "games", "art"
-    tags: [],         // Add relevant tags e.g., ["creative", "interactive", "design"]
-    description: "",  // Brief description of what your tool does
+    category: "visualizers",     // Choose one: "generators", "visualizers", "editors", "utilities", "games", "art"
+    tags: ["text", "animation", "waves", "creative", "design"],         // Add relevant tags e.g., ["creative", "interactive", "design"]
+    description: "Create animated text flowing along customizable wave patterns with sine, cosine, and tangent functions",
     version: "1.0.0",
-    author: ""        // Your name or handle
+    author: "Chatooly"        // Your name or handle
 };
