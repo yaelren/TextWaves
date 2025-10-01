@@ -70,7 +70,7 @@ let baseSpeedY = 1;
 
 // Text Waves Tool State
 const tool = {
-    text: 'WAVE TEXT ANIMATION',
+    text: '+++++     wave         text       animation',
     splitMode: 'character',
     waveTypeX: 'sine',
     waveTypeY: 'sine',
@@ -80,12 +80,17 @@ const tool = {
     frequencyY: 0.02,
     speedX: 1,
     speedY: 1,
-    repetitions: 3,
-    textColors: ['#D9F20C'], // Neon yellow from palette
-    blendMode: 'source-over',
-    fontFamily: 'Wix Madefor Display',
-    fontSize: 19,
-    bgColor: '#0F0E54', // Navy blue from palette
+    repetitions: 10,
+    textColors: ['#FFFFFF'], // White
+    blendMode: 'difference',
+    fontFamily: 'Wix Madefor Text',
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontStyle: 'normal',
+    textHighlight: false,
+    highlightColor: '#FFFF00',
+    letterSpacing: -0.1,
+    bgColor: '#CCFD50', // Neon green background
     bgTransparent: false,
     bgImage: null,
     bgFit: 'cover',
@@ -93,11 +98,11 @@ const tool = {
     iconSize: 20,
     rotateText: true,
     direction: 'right', // 'right', 'left', or 'none'
-    showWavePath: false,
+    showWavePath: true,
     waveShape: 'circle',
-    waveColor: '#ff00ff',
-    waveOpacity: 1,
-    waveMarkerSize: 5,
+    waveColor: '#FF1493', // Hot pink
+    waveOpacity: 0.31,
+    waveMarkerSize: 35,
     timeX: 0,
     timeY: 0
 };
@@ -250,7 +255,7 @@ function render() {
     drawBackground();
 
     // Set text properties
-    ctx.font = `${tool.fontSize}px ${tool.fontFamily}, sans-serif`;
+    ctx.font = `${tool.fontStyle} ${tool.fontWeight} ${tool.fontSize}px ${tool.fontFamily}, sans-serif`;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
     ctx.globalCompositeOperation = tool.blendMode;
@@ -259,7 +264,7 @@ function render() {
     const parts = splitText(tool.text, tool.splitMode);
 
     // Calculate total text width for centering
-    const spacing = tool.fontSize * 0.6;
+    const spacing = tool.fontSize * tool.letterSpacing;
     let totalWidth = 0;
     parts.forEach(part => {
         totalWidth += ctx.measureText(part).width + spacing;
@@ -314,6 +319,17 @@ function render() {
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(rotation);
+
+            // Draw highlight background if enabled
+            if (tool.textHighlight) {
+                const textMetrics = ctx.measureText(part);
+                const textHeight = tool.fontSize;
+                ctx.fillStyle = tool.highlightColor;
+                ctx.fillRect(-textMetrics.width / 2, -textHeight / 2, textMetrics.width, textHeight);
+                // Reset text color after highlight
+                ctx.fillStyle = tool.textColors[colorIndex];
+            }
+
             ctx.fillText(part, 0, 0);
             ctx.restore();
 
@@ -359,9 +375,14 @@ function render() {
 }
 
 // Animation loop
+let isPlaying = true;
+let animationId;
+
 function animate() {
     render();
-    requestAnimationFrame(animate);
+    if (isPlaying) {
+        animationId = requestAnimationFrame(animate);
+    }
 }
 animate();
 
@@ -371,12 +392,13 @@ function renderColorInputs() {
     container.innerHTML = '';
 
     tool.textColors.forEach((color, index) => {
-        const colorItem = document.createElement('div');
-        colorItem.className = 'color-item';
+        const colorWrapper = document.createElement('div');
+        colorWrapper.style.cssText = 'position: relative; display: inline-block;';
 
         const colorInput = document.createElement('input');
         colorInput.type = 'color';
         colorInput.value = color;
+        colorInput.style.cssText = 'width: 50px; height: 50px; border: 2px solid #555; border-radius: 4px; cursor: pointer;';
         colorInput.addEventListener('input', (e) => {
             tool.textColors[index] = e.target.value;
         });
@@ -384,6 +406,7 @@ function renderColorInputs() {
         const removeBtn = document.createElement('button');
         removeBtn.textContent = '×';
         removeBtn.type = 'button';
+        removeBtn.style.cssText = 'position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; padding: 0; font-size: 14px; line-height: 18px; background: #ff4444; color: white; border: none; border-radius: 50%; cursor: pointer;';
         removeBtn.addEventListener('click', () => {
             if (tool.textColors.length > 1) {
                 tool.textColors.splice(index, 1);
@@ -391,9 +414,11 @@ function renderColorInputs() {
             }
         });
 
-        colorItem.appendChild(colorInput);
-        colorItem.appendChild(removeBtn);
-        container.appendChild(colorItem);
+        colorWrapper.appendChild(colorInput);
+        if (tool.textColors.length > 1) {
+            colorWrapper.appendChild(removeBtn);
+        }
+        container.appendChild(colorWrapper);
     });
 }
 
@@ -403,6 +428,17 @@ renderColorInputs();
 // Apply infinity preset on load
 document.getElementById('pattern-preset').value = 'infinity';
 applyPreset('infinity');
+
+// Play/Pause button
+document.getElementById('play-pause-btn').addEventListener('click', (e) => {
+    isPlaying = !isPlaying;
+    e.target.textContent = isPlaying ? '⏸' : '▶';
+    e.target.style.background = isPlaying ? 'rgba(255, 255, 255, 0.1)' : 'transparent';
+
+    if (isPlaying) {
+        animate();
+    }
+});
 
 // Add color button
 document.getElementById('add-color-btn').addEventListener('click', () => {
@@ -514,8 +550,19 @@ document.getElementById('direction').addEventListener('change', (e) => {
 
 document.getElementById('show-wave-path').addEventListener('change', (e) => {
     tool.showWavePath = e.target.checked;
-    // Show/hide wave guide options based on checkbox
-    document.getElementById('wave-guide-options').style.display = e.target.checked ? 'block' : 'none';
+    const waveGuideOptions = document.getElementById('wave-guide-options');
+    const waveGuideHeader = document.getElementById('wave-guide-header');
+
+    if (e.target.checked) {
+        // Enable and show options
+        waveGuideOptions.style.display = 'block';
+        waveGuideOptions.style.opacity = '1';
+        waveGuideHeader.style.opacity = '1';
+    } else {
+        // Gray out and hide options
+        waveGuideOptions.style.display = 'none';
+        waveGuideHeader.style.opacity = '0.5';
+    }
 });
 
 document.getElementById('wave-shape').addEventListener('change', (e) => {
@@ -526,12 +573,12 @@ document.getElementById('wave-color').addEventListener('input', (e) => {
     tool.waveColor = e.target.value;
 });
 
-// Wave Opacity
 document.getElementById('wave-opacity').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
     tool.waveOpacity = value;
     document.getElementById('wave-opacity-input').value = value;
 });
+
 document.getElementById('wave-opacity-input').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value) || 0;
     tool.waveOpacity = Math.max(0, Math.min(1, value));
@@ -628,6 +675,42 @@ document.getElementById('font-size-input').addEventListener('input', (e) => {
     const value = parseInt(e.target.value) || 12;
     tool.fontSize = value;
     document.getElementById('font-size').value = value;
+});
+
+// Bold button toggle
+document.getElementById('bold-btn').addEventListener('click', (e) => {
+    tool.fontWeight = tool.fontWeight === 'bold' ? 'normal' : 'bold';
+    e.target.style.background = tool.fontWeight === 'bold' ? '#667eea' : '#333';
+});
+
+// Italic button toggle
+document.getElementById('italic-btn').addEventListener('click', (e) => {
+    tool.fontStyle = tool.fontStyle === 'italic' ? 'normal' : 'italic';
+    e.target.style.background = tool.fontStyle === 'italic' ? '#667eea' : '#333';
+});
+
+// Highlight button toggle
+document.getElementById('highlight-btn').addEventListener('click', (e) => {
+    tool.textHighlight = !tool.textHighlight;
+    e.target.style.background = tool.textHighlight ? '#667eea' : '#333';
+    // Show/hide highlight color picker (now directly under H button)
+    document.getElementById('highlight-color').style.display = tool.textHighlight ? 'block' : 'none';
+});
+
+document.getElementById('highlight-color').addEventListener('input', (e) => {
+    tool.highlightColor = e.target.value;
+});
+
+// Letter spacing
+document.getElementById('letter-spacing').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value);
+    tool.letterSpacing = value;
+    document.getElementById('letter-spacing-input').value = value;
+});
+document.getElementById('letter-spacing-input').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value) || 0;
+    tool.letterSpacing = value;
+    document.getElementById('letter-spacing').value = value;
 });
 
 document.getElementById('transparent-bg').addEventListener('change', (e) => {
@@ -772,7 +855,23 @@ function switchToCustom() {
 
 // Pattern Preset Selector
 document.getElementById('pattern-preset').addEventListener('change', (e) => {
-    applyPreset(e.target.value);
+    const selectedPreset = e.target.value;
+    applyPreset(selectedPreset);
+
+    // Show/hide sections based on preset selection
+    const presetControlsSection = document.getElementById('preset-controls-section');
+    const customAnimationSection = document.getElementById('custom-params-section');
+
+    if (selectedPreset === 'custom') {
+        // Hide preset controls, show custom animation sections
+        presetControlsSection.style.display = 'none';
+        customAnimationSection.style.display = 'block';
+        customAnimationSection.classList.remove('collapsed');
+    } else {
+        // Show preset controls, hide custom animation sections
+        presetControlsSection.style.display = 'block';
+        customAnimationSection.style.display = 'none';
+    }
 });
 
 // Overall Speed Control
@@ -874,15 +973,6 @@ sectionPairs.forEach(pair => {
         header.classList.toggle('expanded');
         content.classList.toggle('collapsed');
     });
-});
-
-// Custom Animation Parameters sub-section
-const customParamsHeader = document.getElementById('custom-params-header');
-const customParamsSection = document.getElementById('custom-params-section');
-
-customParamsHeader.addEventListener('click', () => {
-    customParamsHeader.classList.toggle('expanded');
-    customParamsSection.classList.toggle('collapsed');
 });
 
 // Horizontal Movement parameter section
@@ -1057,14 +1147,69 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
     tool.direction = randomDirection;
     document.getElementById('direction').value = randomDirection;
 
-    // Random font size (24 - 500) - much larger range for dramatic effects
-    const randomFontSize = Math.floor(Math.random() * 476 + 24);
+    // Random font size with weighted distribution (favor extremes)
+    // 40% small (12-40px), 40% large (120-200px), 20% medium (40-120px)
+    const sizeCategory = Math.random();
+    let randomFontSize;
+    if (sizeCategory < 0.4) {
+        // Small fonts (12-40px)
+        randomFontSize = Math.floor(Math.random() * 29 + 12);
+    } else if (sizeCategory < 0.8) {
+        // Large fonts (120-200px)
+        randomFontSize = Math.floor(Math.random() * 81 + 120);
+    } else {
+        // Medium fonts (40-120px)
+        randomFontSize = Math.floor(Math.random() * 81 + 40);
+    }
     tool.fontSize = randomFontSize;
     document.getElementById('font-size').value = randomFontSize;
     document.getElementById('font-size-input').value = randomFontSize;
 
-    // Random blend mode (pick from interesting ones)
-    const blendModes = ['source-over', 'multiply', 'screen', 'overlay', 'difference', 'color-dodge'];
+    // Random font weight (50% chance)
+    const randomBold = Math.random() > 0.5;
+    tool.fontWeight = randomBold ? 'bold' : 'normal';
+    document.getElementById('bold-btn').style.background = randomBold ? '#667eea' : '#333';
+
+    // Random font style (30% chance)
+    const randomItalic = Math.random() > 0.7;
+    tool.fontStyle = randomItalic ? 'italic' : 'normal';
+    document.getElementById('italic-btn').style.background = randomItalic ? '#667eea' : '#333';
+
+    // Random highlight (20% chance)
+    const randomHighlight = Math.random() < 0.2;
+    tool.textHighlight = randomHighlight;
+    document.getElementById('highlight-btn').style.background = randomHighlight ? '#667eea' : '#333';
+    document.getElementById('highlight-color').style.display = randomHighlight ? 'block' : 'none';
+
+    if (randomHighlight) {
+        // Random highlight color (vibrant)
+        const hlHue = Math.floor(Math.random() * 360);
+        const hlSaturation = Math.floor(Math.random() * 30 + 70);
+        const hlLightness = Math.floor(Math.random() * 40 + 40);
+        const hlColor = `hsl(${hlHue}, ${hlSaturation}%, ${hlLightness}%)`;
+
+        const tempDiv3 = document.createElement('div');
+        tempDiv3.style.color = hlColor;
+        document.body.appendChild(tempDiv3);
+        const computedHlColor = window.getComputedStyle(tempDiv3).color;
+        document.body.removeChild(tempDiv3);
+
+        const hlRgb = computedHlColor.match(/\d+/g);
+        if (hlRgb) {
+            const hlHex = '#' + hlRgb.map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+            tool.highlightColor = hlHex;
+            document.getElementById('highlight-color').value = hlHex;
+        }
+    }
+
+    // Random letter spacing (0.3 - 1.2)
+    const randomSpacing = (Math.random() * 0.9 + 0.3).toFixed(1);
+    tool.letterSpacing = parseFloat(randomSpacing);
+    document.getElementById('letter-spacing').value = randomSpacing;
+    document.getElementById('letter-spacing-input').value = randomSpacing;
+
+    // Random blend mode (normal, difference, screen only)
+    const blendModes = ['source-over', 'difference', 'screen'];
     const randomBlend = blendModes[Math.floor(Math.random() * blendModes.length)];
     tool.blendMode = randomBlend;
     document.getElementById('blend-mode').value = randomBlend;
@@ -1194,7 +1339,7 @@ window.renderHighResolution = function(targetCanvas, scale) {
     }
 
     // Set text properties
-    exportCtx.font = `${tool.fontSize}px ${tool.fontFamily}, sans-serif`;
+    exportCtx.font = `${tool.fontStyle} ${tool.fontWeight} ${tool.fontSize}px ${tool.fontFamily}, sans-serif`;
     exportCtx.textBaseline = 'middle';
     exportCtx.textAlign = 'center';
     exportCtx.globalCompositeOperation = tool.blendMode;
@@ -1203,7 +1348,7 @@ window.renderHighResolution = function(targetCanvas, scale) {
     const parts = splitText(tool.text, tool.splitMode);
 
     // Calculate total text width
-    const spacing = tool.fontSize * 0.6;
+    const spacing = tool.fontSize * tool.letterSpacing;
     let totalWidth = 0;
     parts.forEach(part => {
         totalWidth += exportCtx.measureText(part).width + spacing;
@@ -1286,6 +1431,17 @@ window.renderHighResolution = function(targetCanvas, scale) {
             exportCtx.save();
             exportCtx.translate(x, y);
             exportCtx.rotate(rotation);
+
+            // Draw highlight background if enabled
+            if (tool.textHighlight) {
+                const textMetrics = exportCtx.measureText(part);
+                const textHeight = tool.fontSize;
+                exportCtx.fillStyle = tool.highlightColor;
+                exportCtx.fillRect(-textMetrics.width / 2, -textHeight / 2, textMetrics.width, textHeight);
+                // Reset text color after highlight
+                exportCtx.fillStyle = tool.textColors[colorIndex];
+            }
+
             exportCtx.fillText(part, 0, 0);
             exportCtx.restore();
 
