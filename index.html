@@ -54,7 +54,7 @@
                 <div id="text-section" class="section-content">
                     <div class="chatooly-control-group">
                         <label for="text-input">Text Content</label>
-                        <textarea id="text-input" rows="3" placeholder="Enter your text here...">+++++     wave         text       animation</textarea>
+                        <textarea id="text-input" rows="3" placeholder="Enter your text here...">studio video //</textarea>
                     </div>
 
                     <div class="chatooly-control-group">
@@ -67,8 +67,11 @@
                     </div>
 
                     <div class="chatooly-control-group">
-                        <label for="repetitions">Repetitions: <span id="repetitions-value">10</span></label>
-                        <input type="range" id="repetitions" min="1" max="10" value="10">
+                        <label for="repetitions">Repetitions</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="range" id="repetitions" min="1" max="10" value="10" style="flex: 1;">
+                            <input type="number" id="repetitions-input" min="1" max="10" value="10" style="width: 60px;">
+                        </div>
                     </div>
 
                     <div class="chatooly-control-group">
@@ -378,8 +381,8 @@
                         <div class="chatooly-control-group">
                             <label for="wave-marker-size">Point Size</label>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="range" id="wave-marker-size" min="2" max="100" value="35" style="flex: 1;">
-                                <input type="number" id="wave-marker-size-input" min="2" value="35" style="width: 60px;">
+                                <input type="range" id="wave-marker-size" min="2" max="100" value="60" style="flex: 1;">
+                                <input type="number" id="wave-marker-size-input" min="2" value="60" style="width: 60px;">
                             </div>
                         </div>
                     </div>
@@ -460,8 +463,11 @@
             transition: opacity 0.2s;
             margin-bottom: 4px;
             margin-top: 8px;
-            padding: 4px 0;
-            color: #CCFD50;
+            padding: 4px 8px;
+            color: #000000;
+            background-color: #CCFD50;
+            font-weight: bold;
+            border-radius: 4px;
         }
 
         .section-header:hover {

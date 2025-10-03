@@ -70,7 +70,7 @@ let baseSpeedY = 1;
 
 // Text Waves Tool State
 const tool = {
-    text: '+++++     wave         text       animation',
+    text: 'studio video //',
     splitMode: 'character',
     waveTypeX: 'sine',
     waveTypeY: 'sine',
@@ -102,7 +102,7 @@ const tool = {
     waveShape: 'circle',
     waveColor: '#FF1493', // Hot pink
     waveOpacity: 0.31,
-    waveMarkerSize: 35,
+    waveMarkerSize: 60,
     timeX: 0,
     timeY: 0
 };
@@ -537,7 +537,12 @@ document.getElementById('frequency-y-input').addEventListener('input', (e) => {
 
 document.getElementById('repetitions').addEventListener('input', (e) => {
     tool.repetitions = parseInt(e.target.value);
-    document.getElementById('repetitions-value').textContent = tool.repetitions;
+    document.getElementById('repetitions-input').value = tool.repetitions;
+});
+
+document.getElementById('repetitions-input').addEventListener('input', (e) => {
+    tool.repetitions = parseInt(e.target.value);
+    document.getElementById('repetitions').value = tool.repetitions;
 });
 
 document.getElementById('rotate-text').addEventListener('change', (e) => {
@@ -1088,7 +1093,7 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
     const randomRepetitions = Math.floor(Math.random() * 6 + 1);
     tool.repetitions = randomRepetitions;
     document.getElementById('repetitions').value = randomRepetitions;
-    document.getElementById('repetitions-value').textContent = randomRepetitions;
+    document.getElementById('repetitions-input').value = randomRepetitions;
 
     // Switch to custom mode instead of using presets
     document.getElementById('pattern-preset').value = 'custom';
