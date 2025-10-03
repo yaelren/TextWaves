@@ -72,6 +72,7 @@ let baseSpeedY = 1;
 const tool = {
     text: 'studio video //',
     splitMode: 'character',
+    textFlow: 'horizontal', // 'horizontal' or 'vertical'
     waveTypeX: 'sine',
     waveTypeY: 'sine',
     amplitudeX: 100,
@@ -263,40 +264,67 @@ function render() {
     // Split text
     const parts = splitText(tool.text, tool.splitMode);
 
-    // Calculate total text width for centering
+    // Calculate spacing and total size based on text flow
     const spacing = tool.fontSize * tool.letterSpacing;
-    let totalWidth = 0;
-    parts.forEach(part => {
-        totalWidth += ctx.measureText(part).width + spacing;
-    });
-
-    // Add icon size to spacing if icon exists
     const iconSpacing = tool.segmentIcon ? tool.iconSize + spacing : 0;
 
-    // Start from left to center the entire animation
-    const startX = canvas.width / 2 - (totalWidth * tool.repetitions) / 2;
+    let totalSize = 0;
+    parts.forEach(part => {
+        if (tool.textFlow === 'horizontal') {
+            totalSize += ctx.measureText(part).width + spacing + iconSpacing;
+        } else {
+            // For vertical flow, approximate height based on font size
+            totalSize += tool.fontSize + spacing + iconSpacing;
+        }
+    });
 
     // Track segment index for color cycling
     let segmentIndex = 0;
 
     // Render text with repetitions
     for (let rep = 0; rep < tool.repetitions; rep++) {
-        let xOffset = 0;
+        let offset = 0;
 
         parts.forEach((part, i) => {
             const partWidth = ctx.measureText(part).width;
-            const baseX = startX + rep * totalWidth + xOffset + partWidth / 2;
 
-            // Calculate wave offsets for X and Y
-            const waveInputX = baseX * tool.frequencyX + tool.timeX;
-            const waveInputY = baseX * tool.frequencyY + tool.timeY;
+            let basePos, x, y, waveInputX, waveInputY, offsetX, offsetY;
 
-            const offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
-            const offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+            if (tool.textFlow === 'horizontal') {
+                // HORIZONTAL FLOW: Text flows left-to-right
+                const startX = canvas.width / 2 - (totalSize * tool.repetitions) / 2;
+                basePos = startX + rep * totalSize + offset + partWidth / 2;
 
-            // Calculate final position
-            const x = baseX + offsetX;
-            const y = canvas.height / 2 + offsetY;
+                // Wave input based on horizontal position
+                waveInputX = basePos * tool.frequencyX + tool.timeX;
+                waveInputY = basePos * tool.frequencyY + tool.timeY;
+
+                offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
+                offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+
+                // Final position
+                x = basePos + offsetX;
+                y = canvas.height / 2 + offsetY;
+
+                offset += partWidth + spacing + iconSpacing;
+            } else {
+                // VERTICAL FLOW: Text flows top-to-bottom
+                const startY = canvas.height / 2 - (totalSize * tool.repetitions) / 2;
+                basePos = startY + rep * totalSize + offset + tool.fontSize / 2;
+
+                // Wave input based on vertical position
+                waveInputX = basePos * tool.frequencyX + tool.timeX;
+                waveInputY = basePos * tool.frequencyY + tool.timeY;
+
+                offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
+                offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+
+                // Final position - X is center + wave offset, Y is base position + wave offset
+                x = canvas.width / 2 + offsetX;
+                y = basePos + offsetY;
+
+                offset += tool.fontSize + spacing + iconSpacing;
+            }
 
             // Draw wave path visualization
             if (tool.showWavePath) {
@@ -335,8 +363,14 @@ function render() {
 
             // Draw segment icon after text
             if (tool.segmentIcon && part.trim().length > 0) {
-                const iconX = x + partWidth / 2 + iconSpacing / 2;
-                const iconY = y;
+                let iconX, iconY;
+                if (tool.textFlow === 'horizontal') {
+                    iconX = x + partWidth / 2 + iconSpacing / 2;
+                    iconY = y;
+                } else {
+                    iconX = x;
+                    iconY = y + tool.fontSize / 2 + iconSpacing / 2;
+                }
 
                 ctx.save();
                 ctx.translate(iconX, iconY);
@@ -350,8 +384,6 @@ function render() {
                 );
                 ctx.restore();
             }
-
-            xOffset += partWidth + spacing + iconSpacing;
 
             // Only increment segment index for non-whitespace parts
             if (part.trim().length > 0) {
@@ -453,6 +485,15 @@ document.getElementById('text-input').addEventListener('input', (e) => {
 
 document.getElementById('split-mode').addEventListener('change', (e) => {
     tool.splitMode = e.target.value;
+
+    // Update spacing label based on split mode
+    const spacingLabel = document.getElementById('spacing-label');
+    const labelMap = {
+        'character': 'Space Between Characters',
+        'word': 'Space Between Words',
+        'sentence': 'Space Between Sentences'
+    };
+    spacingLabel.textContent = labelMap[e.target.value] || 'Space Between Characters';
 });
 
 document.getElementById('wave-type-x').addEventListener('change', (e) => {
@@ -547,6 +588,10 @@ document.getElementById('repetitions-input').addEventListener('input', (e) => {
 
 document.getElementById('rotate-text').addEventListener('change', (e) => {
     tool.rotateText = e.target.checked;
+});
+
+document.getElementById('text-flow').addEventListener('change', (e) => {
+    tool.textFlow = e.target.value;
 });
 
 document.getElementById('direction').addEventListener('change', (e) => {
@@ -1095,8 +1140,25 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
     document.getElementById('repetitions').value = randomRepetitions;
     document.getElementById('repetitions-input').value = randomRepetitions;
 
-    // Switch to custom mode instead of using presets
+    // Switch to custom mode and show custom parameters section
     document.getElementById('pattern-preset').value = 'custom';
+    const presetControlsSection = document.getElementById('preset-controls-section');
+    const customAnimationSection = document.getElementById('custom-params-section');
+
+    presetControlsSection.style.display = 'none';
+    customAnimationSection.style.display = 'block';
+    customAnimationSection.classList.remove('collapsed');
+
+    // Expand horizontal and vertical movement sections so user can see what was randomized
+    const horizontalHeader = document.getElementById('horizontal-header');
+    const horizontalSection = document.getElementById('horizontal-movement-section');
+    const verticalHeader = document.getElementById('vertical-header');
+    const verticalSection = document.getElementById('vertical-movement-section');
+
+    horizontalHeader.classList.add('expanded');
+    horizontalSection.classList.remove('collapsed');
+    verticalHeader.classList.add('expanded');
+    verticalSection.classList.remove('collapsed');
 
     // Randomly select wave types (less likely to be 'none')
     const horizontalTypes = ['sine', 'cosine', 'tangent', 'sine', 'cosine'];
@@ -1146,8 +1208,14 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
     document.getElementById('speed-y').value = randomSpeedY;
     document.getElementById('speed-y-input').value = randomSpeedY;
 
-    // Random direction (more likely to move)
-    const directions = ['right', 'right', 'left', 'left', 'none'];
+    // Random text flow (50% chance vertical)
+    const textFlows = ['horizontal', 'vertical'];
+    const randomTextFlow = textFlows[Math.floor(Math.random() * textFlows.length)];
+    tool.textFlow = randomTextFlow;
+    document.getElementById('text-flow').value = randomTextFlow;
+
+    // Random direction
+    const directions = ['right', 'left'];
     const randomDirection = directions[Math.floor(Math.random() * directions.length)];
     tool.direction = randomDirection;
     document.getElementById('direction').value = randomDirection;
@@ -1352,35 +1420,60 @@ window.renderHighResolution = function(targetCanvas, scale) {
     // Split text
     const parts = splitText(tool.text, tool.splitMode);
 
-    // Calculate total text width
+    // Calculate spacing and total size based on text flow
     const spacing = tool.fontSize * tool.letterSpacing;
-    let totalWidth = 0;
-    parts.forEach(part => {
-        totalWidth += exportCtx.measureText(part).width + spacing;
-    });
-
     const iconSpacing = tool.segmentIcon ? tool.iconSize + spacing : 0;
-    const startX = canvas.width / 2 - (totalWidth * tool.repetitions) / 2;
+
+    let totalSize = 0;
+    parts.forEach(part => {
+        if (tool.textFlow === 'horizontal') {
+            totalSize += exportCtx.measureText(part).width + spacing + iconSpacing;
+        } else {
+            totalSize += tool.fontSize + spacing + iconSpacing;
+        }
+    });
 
     // Track segment index for color cycling
     let segmentIndex = 0;
 
     // Render text with repetitions (capture current frame)
     for (let rep = 0; rep < tool.repetitions; rep++) {
-        let xOffset = 0;
+        let offset = 0;
 
         parts.forEach((part, i) => {
             const partWidth = exportCtx.measureText(part).width;
-            const baseX = startX + rep * totalWidth + xOffset + partWidth / 2;
 
-            const waveInputX = baseX * tool.frequencyX + tool.timeX;
-            const waveInputY = baseX * tool.frequencyY + tool.timeY;
+            let basePos, x, y, waveInputX, waveInputY, offsetX, offsetY;
 
-            const offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
-            const offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+            if (tool.textFlow === 'horizontal') {
+                const startX = canvas.width / 2 - (totalSize * tool.repetitions) / 2;
+                basePos = startX + rep * totalSize + offset + partWidth / 2;
 
-            const x = baseX + offsetX;
-            const y = canvas.height / 2 + offsetY;
+                waveInputX = basePos * tool.frequencyX + tool.timeX;
+                waveInputY = basePos * tool.frequencyY + tool.timeY;
+
+                offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
+                offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+
+                x = basePos + offsetX;
+                y = canvas.height / 2 + offsetY;
+
+                offset += partWidth + spacing + iconSpacing;
+            } else {
+                const startY = canvas.height / 2 - (totalSize * tool.repetitions) / 2;
+                basePos = startY + rep * totalSize + offset + tool.fontSize / 2;
+
+                waveInputX = basePos * tool.frequencyX + tool.timeX;
+                waveInputY = basePos * tool.frequencyY + tool.timeY;
+
+                offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
+                offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
+
+                x = canvas.width / 2 + offsetX;
+                y = basePos + offsetY;
+
+                offset += tool.fontSize + spacing + iconSpacing;
+            }
 
             // Draw wave path visualization
             if (tool.showWavePath) {
@@ -1451,8 +1544,14 @@ window.renderHighResolution = function(targetCanvas, scale) {
             exportCtx.restore();
 
             if (tool.segmentIcon && part.trim().length > 0) {
-                const iconX = x + partWidth / 2 + iconSpacing / 2;
-                const iconY = y;
+                let iconX, iconY;
+                if (tool.textFlow === 'horizontal') {
+                    iconX = x + partWidth / 2 + iconSpacing / 2;
+                    iconY = y;
+                } else {
+                    iconX = x;
+                    iconY = y + tool.fontSize / 2 + iconSpacing / 2;
+                }
 
                 exportCtx.save();
                 exportCtx.translate(iconX, iconY);
@@ -1466,8 +1565,6 @@ window.renderHighResolution = function(targetCanvas, scale) {
                 );
                 exportCtx.restore();
             }
-
-            xOffset += partWidth + spacing + iconSpacing;
 
             // Only increment segment index for non-whitespace parts
             if (part.trim().length > 0) {

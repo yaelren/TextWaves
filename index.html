@@ -60,10 +60,24 @@
                     <div class="chatooly-control-group">
                         <label for="split-mode">Break Text Into</label>
                         <select id="split-mode">
-                            <option value="character">Character</option>
-                            <option value="word">Word</option>
-                            <option value="sentence">Sentence</option>
+                            <option value="character">Characters</option>
+                            <option value="word">Words</option>
+                            <option value="sentence">Sentences</option>
                         </select>
+                    </div>
+
+                    <div class="chatooly-control-group">
+                        <label>
+                            <input type="checkbox" id="rotate-text" checked> Rotate Letters on Wave Path
+                        </label>
+                    </div>
+
+                    <div class="chatooly-control-group">
+                        <label for="letter-spacing" id="spacing-label">Space Between Characters</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="range" id="letter-spacing" min="-1" max="2" step="0.1" value="-0.1" style="flex: 1;">
+                            <input type="number" id="letter-spacing-input" min="-1" max="2" step="0.1" value="-0.1" style="width: 60px;">
+                        </div>
                     </div>
 
                     <div class="chatooly-control-group">
@@ -123,14 +137,6 @@
                         <label>Text Colors</label>
                         <div id="text-colors-container" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
                         <button id="add-color-btn" type="button" style="margin-top: 8px; width: 100%; padding: 6px; font-size: 0.9em;">+ Add Color</button>
-                    </div>
-
-                    <div class="chatooly-control-group">
-                        <label for="letter-spacing">Character Spacing</label>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <input type="range" id="letter-spacing" min="-1" max="2" step="0.1" value="-0.1" style="flex: 1;">
-                            <input type="number" id="letter-spacing-input" min="-1" max="2" step="0.1" value="-0.1" style="width: 60px;">
-                        </div>
                     </div>
 
                     <div class="chatooly-control-group">
@@ -211,9 +217,11 @@
                     </div>
 
                     <div class="chatooly-control-group">
-                        <label>
-                            <input type="checkbox" id="rotate-text" checked> Follow Wave Path
-                        </label>
+                        <label for="text-flow">Text Flow</label>
+                        <select id="text-flow">
+                            <option value="horizontal" selected>Horizontal →</option>
+                            <option value="vertical">Vertical ↓</option>
+                        </select>
                     </div>
 
                     <div class="chatooly-control-group">
@@ -221,7 +229,6 @@
                         <select id="direction">
                             <option value="right" selected>Right →</option>
                             <option value="left">Left ←</option>
-                            <option value="none">None (Static)</option>
                         </select>
                     </div>
 
