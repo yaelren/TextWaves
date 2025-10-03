@@ -108,6 +108,50 @@ const tool = {
     timeY: 0
 };
 
+// Entrance animation state
+let entranceProgress = 0; // 0 = centered, 1 = fully split
+const ENTRANCE_DURATION = 60; // frames for entrance animation
+let isEntranceAnimating = true;
+let entranceSpeed = 1; // Speed multiplier for entrance animation
+let entranceType = 'split'; // Type of entrance animation
+let entranceEasing = 'linear'; // Easing function to use
+let entranceDelay = 0; // Delay in seconds before starting entrance
+let entranceDelayFrames = 0; // Frame counter for delay
+
+// Function to reset entrance animation
+function resetEntranceAnimation() {
+    entranceProgress = 0;
+    isEntranceAnimating = true;
+    entranceDelayFrames = entranceDelay * 60; // Convert seconds to frames (60fps)
+}
+
+// Easing functions
+const easingFunctions = {
+    linear: (t) => t,
+    easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+    easeInCubic: (t) => t * t * t,
+    easeInOutCubic: (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    easeOutQuad: (t) => 1 - (1 - t) * (1 - t),
+    easeInOutQuad: (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+    easeOutQuart: (t) => 1 - Math.pow(1 - t, 4),
+    easeOutBack: (t) => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    },
+    easeInOutBack: (t) => {
+        const c1 = 1.70158;
+        const c2 = c1 * 1.525;
+        return t < 0.5
+            ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
+            : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
+    },
+    easeOutElastic: (t) => {
+        const c4 = (2 * Math.PI) / 3;
+        return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+    }
+};
+
 // Wave calculation functions
 function calculateWave(type, value) {
     switch(type) {
@@ -278,6 +322,10 @@ function render() {
         }
     });
 
+    // Calculate entrance animation progress with selected easing
+    const easingFunc = easingFunctions[entranceEasing] || easingFunctions.easeOutCubic;
+    const easedProgress = easingFunc(entranceProgress);
+
     // Track segment index for color cycling
     let segmentIndex = 0;
 
@@ -302,9 +350,30 @@ function render() {
                 offsetX = calculateWave(tool.waveTypeX, waveInputX) * tool.amplitudeX;
                 offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
 
-                // Final position
-                x = basePos + offsetX;
-                y = canvas.height / 2 + offsetY;
+                // Final position with wave
+                const finalX = basePos + offsetX;
+                const finalY = canvas.height / 2 + offsetY;
+
+                // Calculate center position - text laid out horizontally in center
+                const singleRepSize = totalSize / tool.repetitions;
+                const centerX = canvas.width / 2 - singleRepSize / 2 + offset;
+                const centerY = canvas.height / 2;
+
+                // Apply entrance animation based on type
+                if (entranceType === 'split') {
+                    x = centerX + (finalX - centerX) * easedProgress;
+                    y = centerY + (finalY - centerY) * easedProgress;
+                } else if (entranceType === 'fade') {
+                    x = finalX;
+                    y = finalY;
+                } else if (entranceType === 'scale') {
+                    x = finalX;
+                    y = finalY;
+                } else if (entranceType === 'slide') {
+                    const slideStartX = -partWidth;
+                    x = slideStartX + (finalX - slideStartX) * easedProgress;
+                    y = finalY;
+                }
 
                 offset += partWidth + spacing + iconSpacing;
             } else {
@@ -320,8 +389,29 @@ function render() {
                 offsetY = calculateWave(tool.waveTypeY, waveInputY) * tool.amplitudeY;
 
                 // Final position - X is center + wave offset, Y is base position + wave offset
-                x = canvas.width / 2 + offsetX;
-                y = basePos + offsetY;
+                const finalX = canvas.width / 2 + offsetX;
+                const finalY = basePos + offsetY;
+
+                // Calculate center position - text laid out vertically in center
+                const singleRepSize = totalSize / tool.repetitions;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2 - singleRepSize / 2 + offset;
+
+                // Apply entrance animation based on type
+                if (entranceType === 'split') {
+                    x = centerX + (finalX - centerX) * easedProgress;
+                    y = centerY + (finalY - centerY) * easedProgress;
+                } else if (entranceType === 'fade') {
+                    x = finalX;
+                    y = finalY;
+                } else if (entranceType === 'scale') {
+                    x = finalX;
+                    y = finalY;
+                } else if (entranceType === 'slide') {
+                    const slideStartY = -tool.fontSize;
+                    x = finalX;
+                    y = slideStartY + (finalY - slideStartY) * easedProgress;
+                }
 
                 offset += tool.fontSize + spacing + iconSpacing;
             }
@@ -331,22 +421,36 @@ function render() {
                 drawWaveMarker(x, y, tool.waveShape, tool.waveMarkerSize, tool.waveColor, tool.waveOpacity);
             }
 
-            // Calculate rotation if enabled
+            // Calculate rotation if enabled - gradual rotation during entrance
             let rotation = 0;
             if (tool.rotateText) {
                 const dxX = calculateWaveDerivative(tool.waveTypeX, waveInputX, tool.amplitudeX, tool.frequencyX);
                 const dxY = calculateWaveDerivative(tool.waveTypeY, waveInputY, tool.amplitudeY, tool.frequencyY);
-                rotation = Math.atan2(dxY, 1 + dxX);
+                const finalRotation = Math.atan2(dxY, 1 + dxX);
+                // Gradually rotate from 0 to final rotation during entrance
+                rotation = finalRotation * easedProgress;
             }
 
             // Get color for this segment (cycle through colors array)
             const colorIndex = segmentIndex % tool.textColors.length;
             ctx.fillStyle = tool.textColors[colorIndex];
 
-            // Draw text part with rotation
+            // Apply entrance effects based on type
+            let opacity = 1;
+            let scale = 1;
+
+            if (entranceType === 'fade') {
+                opacity = easedProgress;
+            } else if (entranceType === 'scale') {
+                scale = easedProgress;
+            }
+
+            // Draw text part with rotation and entrance effects
             ctx.save();
+            ctx.globalAlpha = opacity;
             ctx.translate(x, y);
             ctx.rotate(rotation);
+            ctx.scale(scale, scale);
 
             // Draw highlight background if enabled
             if (tool.textHighlight) {
@@ -395,19 +499,38 @@ function render() {
     // Reset blend mode
     ctx.globalCompositeOperation = 'source-over';
 
-    // Update time for both axes based on direction
-    if (tool.direction === 'right') {
-        tool.timeX += 0.02 * tool.speedX;
-        tool.timeY += 0.02 * tool.speedY;
-    } else if (tool.direction === 'left') {
-        tool.timeX -= 0.02 * tool.speedX;
-        tool.timeY -= 0.02 * tool.speedY;
-    } else if (tool.direction === 'down') {
-        tool.timeX += 0.02 * tool.speedX;
-        tool.timeY += 0.02 * tool.speedY;
-    } else if (tool.direction === 'up') {
-        tool.timeX -= 0.02 * tool.speedX;
-        tool.timeY -= 0.02 * tool.speedY;
+    // Update entrance animation progress
+    if (isEntranceAnimating && entranceProgress < 1) {
+        // Handle delay first
+        if (entranceDelayFrames > 0) {
+            entranceDelayFrames--;
+            // Keep progress at 0 during delay
+            entranceProgress = 0;
+        } else {
+            // Start animating after delay
+            entranceProgress += (1 / ENTRANCE_DURATION) * entranceSpeed;
+            if (entranceProgress >= 1) {
+                entranceProgress = 1;
+                isEntranceAnimating = false;
+            }
+        }
+    }
+
+    // Update time for both axes based on direction (only after entrance is complete)
+    if (!isEntranceAnimating) {
+        if (tool.direction === 'right') {
+            tool.timeX += 0.02 * tool.speedX;
+            tool.timeY += 0.02 * tool.speedY;
+        } else if (tool.direction === 'left') {
+            tool.timeX -= 0.02 * tool.speedX;
+            tool.timeY -= 0.02 * tool.speedY;
+        } else if (tool.direction === 'down') {
+            tool.timeX += 0.02 * tool.speedX;
+            tool.timeY += 0.02 * tool.speedY;
+        } else if (tool.direction === 'up') {
+            tool.timeX -= 0.02 * tool.speedX;
+            tool.timeY -= 0.02 * tool.speedY;
+        }
     }
 }
 
@@ -477,6 +600,17 @@ document.getElementById('play-pause-btn').addEventListener('click', (e) => {
     }
 });
 
+// Replay button
+document.getElementById('replay-btn').addEventListener('click', () => {
+    resetEntranceAnimation();
+    if (!isPlaying) {
+        isPlaying = true;
+        document.getElementById('play-pause-btn').textContent = '⏸';
+        document.getElementById('play-pause-btn').style.background = 'rgba(255, 255, 255, 0.1)';
+        animate();
+    }
+});
+
 // Add color button
 document.getElementById('add-color-btn').addEventListener('click', () => {
     tool.textColors.push('#ffffff');
@@ -485,7 +619,8 @@ document.getElementById('add-color-btn').addEventListener('click', () => {
 
 // Event Listeners
 document.getElementById('text-input').addEventListener('input', (e) => {
-    tool.text = e.target.value || 'WAVE TEXT ANIMATION';
+    tool.text = e.target.value;
+    resetEntranceAnimation();
 });
 
 document.getElementById('split-mode').addEventListener('change', (e) => {
@@ -961,6 +1096,44 @@ document.getElementById('pattern-preset').addEventListener('change', (e) => {
     }
 });
 
+// Entrance Type Control
+document.getElementById('entrance-type').addEventListener('change', (e) => {
+    entranceType = e.target.value;
+    resetEntranceAnimation();
+});
+
+// Entrance Easing Control
+document.getElementById('entrance-easing').addEventListener('change', (e) => {
+    entranceEasing = e.target.value;
+    resetEntranceAnimation();
+});
+
+// Entrance Delay Control
+document.getElementById('entrance-delay').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value);
+    entranceDelay = value;
+    document.getElementById('entrance-delay-input').value = value;
+});
+
+document.getElementById('entrance-delay-input').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value) || 0;
+    entranceDelay = value;
+    document.getElementById('entrance-delay').value = Math.min(value, 5); // Clamp slider max
+});
+
+// Entrance Speed Control
+document.getElementById('entrance-speed').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value);
+    entranceSpeed = value;
+    document.getElementById('entrance-speed-input').value = value;
+});
+
+document.getElementById('entrance-speed-input').addEventListener('input', (e) => {
+    const value = parseFloat(e.target.value) || 0.1;
+    entranceSpeed = value;
+    document.getElementById('entrance-speed').value = value;
+});
+
 // Overall Speed Control
 document.getElementById('overall-speed').addEventListener('input', (e) => {
     const value = parseFloat(e.target.value);
@@ -1079,6 +1252,26 @@ verticalHeader.addEventListener('click', () => {
     verticalHeader.classList.toggle('expanded');
     verticalSection.classList.toggle('collapsed');
 });
+
+// ===== Subsection Toggle (Entrance/Wave Animation) =====
+const entranceAnimationHeader = document.getElementById('entrance-animation-header');
+const entranceAnimationSection = document.getElementById('entrance-animation-section');
+const waveAnimationHeader = document.getElementById('wave-animation-header');
+const waveAnimationSection = document.getElementById('wave-animation-section');
+
+if (entranceAnimationHeader && entranceAnimationSection) {
+    entranceAnimationHeader.addEventListener('click', () => {
+        entranceAnimationHeader.classList.toggle('expanded');
+        entranceAnimationSection.classList.toggle('collapsed');
+    });
+}
+
+if (waveAnimationHeader && waveAnimationSection) {
+    waveAnimationHeader.addEventListener('click', () => {
+        waveAnimationHeader.classList.toggle('expanded');
+        waveAnimationSection.classList.toggle('collapsed');
+    });
+}
 
 // ===== Swap Horizontal & Vertical Movement Button =====
 document.getElementById('swap-movement-btn').addEventListener('click', () => {
@@ -1383,6 +1576,9 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
             document.getElementById('wave-color').value = guideHex;
         }
     }
+
+    // Reset entrance animation for surprise
+    resetEntranceAnimation();
 
     console.log('✦ Surprise! New random configuration applied');
 });

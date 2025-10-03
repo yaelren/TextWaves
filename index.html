@@ -40,12 +40,16 @@
                 <p>Create animated text flowing along customizable wave patterns. Choose from preset motion patterns or create your own custom movements.</p>
             </div>
 
-            <div class="chatooly-controls-content">
-                <!-- ========== TOP BUTTONS ========== -->
-                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
+            <!-- ========== STICKY TOP BUTTONS ========== -->
+            <div id="sticky-controls" style="position: sticky; top: 0; z-index: 100; background: var(--chatooly-bg-color, #1a1a1a); padding: 12px 0; margin: -20px -20px 20px -20px; padding-left: 20px; padding-right: 20px; border-bottom: 2px solid var(--chatooly-border-color, #333);">
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                     <button id="play-pause-btn" style="padding: 8px 16px; font-size: 1.2em; background: transparent; color: white; border: 2px solid white; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">▶</button>
+                    <button id="replay-btn" style="padding: 8px 16px; font-size: 1.2em; background: transparent; color: white; border: 2px solid white; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">↻</button>
                     <button id="surprise-me-btn" class="surprise-btn" style="flex: 1; margin-bottom: 0;">✦ Surprise Me ✦</button>
                 </div>
+            </div>
+
+            <div class="chatooly-controls-content">
 
                 <!-- ========== TEXT SECTION ========== -->
                 <h3 class="section-header" id="text-header">
@@ -181,8 +185,67 @@
                     ▶ Animation <span class="section-toggle">▼</span>
                 </h3>
                 <div id="animation-section" class="section-content">
-                    <div class="chatooly-control-group">
-                        <label for="pattern-preset">Pattern Preset</label>
+
+                    <!-- ENTRANCE ANIMATION SUBSECTION -->
+                    <div class="subsection">
+                        <h4 class="subsection-header expanded" id="entrance-animation-header">
+                            ▶ Entrance Animation
+                            <span class="subsection-toggle">▼</span>
+                        </h4>
+                        <div id="entrance-animation-section" class="subsection-content">
+                            <div class="chatooly-control-group">
+                                <label for="entrance-type">Animation Type</label>
+                                <select id="entrance-type">
+                                    <option value="split">Split from Center</option>
+                                    <option value="fade">Fade In Place</option>
+                                    <option value="scale">Scale from Center</option>
+                                    <option value="slide">Slide from Edge</option>
+                                </select>
+                            </div>
+
+                            <div class="chatooly-control-group">
+                                <label for="entrance-easing">Easing</label>
+                                <select id="entrance-easing">
+                                    <option value="linear" selected>Linear</option>
+                                    <option value="easeOutCubic">Ease Out (Cubic)</option>
+                                    <option value="easeInOutCubic">Ease In-Out (Cubic)</option>
+                                    <option value="easeInCubic">Ease In (Cubic)</option>
+                                    <option value="easeOutQuad">Ease Out (Quad)</option>
+                                    <option value="easeInOutQuad">Ease In-Out (Quad)</option>
+                                    <option value="easeOutQuart">Ease Out (Quart)</option>
+                                    <option value="easeOutBack">Ease Out Back</option>
+                                    <option value="easeInOutBack">Ease In-Out Back</option>
+                                    <option value="easeOutElastic">Ease Out Elastic</option>
+                                </select>
+                            </div>
+
+                            <div class="chatooly-control-group">
+                                <label for="entrance-delay">Start Delay (seconds)</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="range" id="entrance-delay" min="0" max="5" step="0.1" value="0" style="flex: 1;">
+                                    <input type="number" id="entrance-delay-input" min="0" max="10" step="0.1" value="0" style="width: 60px;">
+                                </div>
+                            </div>
+
+                            <div class="chatooly-control-group">
+                                <label for="entrance-speed">Speed</label>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="range" id="entrance-speed" min="0.1" max="3" step="0.1" value="1" style="flex: 1;">
+                                    <input type="number" id="entrance-speed-input" min="0.1" max="3" step="0.1" value="1" style="width: 60px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WAVE ANIMATION SUBSECTION -->
+                    <div class="subsection">
+                        <h4 class="subsection-header expanded" id="wave-animation-header">
+                            ∿ Wave Animation
+                            <span class="subsection-toggle">▼</span>
+                        </h4>
+                        <div id="wave-animation-section" class="subsection-content">
+                            <div class="chatooly-control-group">
+                                <label for="pattern-preset">Pattern Preset</label>
                         <select id="pattern-preset">
                             <option value="custom">Custom</option>
                             <option value="wave">Wave</option>
@@ -323,6 +386,8 @@
                         <!-- Swap Button -->
                         <div class="chatooly-control-group">
                             <button id="swap-movement-btn" type="button" style="width: auto; padding: 6px 12px; margin-top: 8px; font-size: 0.9em; background: #667eea;">🔄</button>
+                        </div>
+                    </div>
                         </div>
                     </div>
                 </div>
@@ -546,6 +611,53 @@
         .sub-section-content.collapsed {
             max-height: 0;
             opacity: 0;
+        }
+
+        /* Subsection headers (Entrance/Wave Animation) */
+        .subsection {
+            margin: 16px 0;
+        }
+
+        .subsection-header {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: 700;
+            padding: 8px 0;
+            margin-bottom: 12px;
+            color: white;
+            border-bottom: 2px solid white;
+            transition: all 0.2s;
+        }
+
+        .subsection-header:hover {
+            opacity: 0.8;
+        }
+
+        .subsection-toggle {
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .subsection-header.expanded .subsection-toggle {
+            transform: rotate(180deg);
+        }
+
+        .subsection-content {
+            max-height: 2000px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.4s ease;
+            opacity: 1;
+            padding: 8px 4px;
+        }
+
+        .subsection-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 4px;
         }
 
         /* Parameter sections (Horizontal/Vertical) */
