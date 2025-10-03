@@ -402,8 +402,13 @@ function render() {
     } else if (tool.direction === 'left') {
         tool.timeX -= 0.02 * tool.speedX;
         tool.timeY -= 0.02 * tool.speedY;
+    } else if (tool.direction === 'down') {
+        tool.timeX += 0.02 * tool.speedX;
+        tool.timeY += 0.02 * tool.speedY;
+    } else if (tool.direction === 'up') {
+        tool.timeX -= 0.02 * tool.speedX;
+        tool.timeY -= 0.02 * tool.speedY;
     }
-    // If direction is 'none', don't update time (static)
 }
 
 // Animation loop
@@ -592,6 +597,28 @@ document.getElementById('rotate-text').addEventListener('change', (e) => {
 
 document.getElementById('text-flow').addEventListener('change', (e) => {
     tool.textFlow = e.target.value;
+
+    // Update direction options and label based on text flow
+    const directionSelect = document.getElementById('direction');
+    const directionLabel = document.getElementById('direction-label');
+
+    if (e.target.value === 'horizontal') {
+        // Show horizontal directions
+        directionSelect.innerHTML = `
+            <option value="right">Right →</option>
+            <option value="left">Left ←</option>
+        `;
+        directionLabel.textContent = 'Movement Direction';
+        tool.direction = 'right';
+    } else {
+        // Show vertical directions
+        directionSelect.innerHTML = `
+            <option value="down">Down ↓</option>
+            <option value="up">Up ↑</option>
+        `;
+        directionLabel.textContent = 'Movement Direction';
+        tool.direction = 'down';
+    }
 });
 
 document.getElementById('direction').addEventListener('change', (e) => {
@@ -792,17 +819,27 @@ document.getElementById('bg-image').addEventListener('change', (e) => {
             const img = new Image();
             img.onload = () => {
                 tool.bgImage = img;
-                // Show background fit options when image is uploaded
+                // Show background fit options and clear button when image is uploaded
                 document.getElementById('bg-fit-group').style.display = 'block';
+                document.getElementById('clear-bg-image').style.display = 'block';
             };
             img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     } else {
-        // Hide background fit options when no image
+        // Hide background fit options and clear button when no image
         tool.bgImage = null;
         document.getElementById('bg-fit-group').style.display = 'none';
+        document.getElementById('clear-bg-image').style.display = 'none';
     }
+});
+
+document.getElementById('clear-bg-image').addEventListener('click', () => {
+    // Clear the background image
+    tool.bgImage = null;
+    document.getElementById('bg-image').value = '';
+    document.getElementById('bg-fit-group').style.display = 'none';
+    document.getElementById('clear-bg-image').style.display = 'none';
 });
 
 document.getElementById('segment-icon').addEventListener('change', (e) => {
@@ -1214,11 +1251,27 @@ document.getElementById('surprise-me-btn').addEventListener('click', () => {
     tool.textFlow = randomTextFlow;
     document.getElementById('text-flow').value = randomTextFlow;
 
-    // Random direction
-    const directions = ['right', 'left'];
-    const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-    tool.direction = randomDirection;
-    document.getElementById('direction').value = randomDirection;
+    // Update direction dropdown based on text flow and select random direction
+    const directionSelect = document.getElementById('direction');
+    if (randomTextFlow === 'horizontal') {
+        directionSelect.innerHTML = `
+            <option value="right">Right →</option>
+            <option value="left">Left ←</option>
+        `;
+        const horizontalDirections = ['right', 'left'];
+        const randomDirection = horizontalDirections[Math.floor(Math.random() * horizontalDirections.length)];
+        tool.direction = randomDirection;
+        directionSelect.value = randomDirection;
+    } else {
+        directionSelect.innerHTML = `
+            <option value="down">Down ↓</option>
+            <option value="up">Up ↑</option>
+        `;
+        const verticalDirections = ['down', 'up'];
+        const randomDirection = verticalDirections[Math.floor(Math.random() * verticalDirections.length)];
+        tool.direction = randomDirection;
+        directionSelect.value = randomDirection;
+    }
 
     // Random font size with weighted distribution (favor extremes)
     // 40% small (12-40px), 40% large (120-200px), 20% medium (40-120px)
