@@ -1827,3 +1827,54 @@ window.renderHighResolution = function(targetCanvas, scale) {
 
     console.log(`High-res export completed at ${scale}x resolution`);
 };
+
+// ===== Video Export Hook: Reset Animation Before Recording =====
+// Hook into Chatooly CDN's video recording to restart entrance animation
+if (window.Chatooly && window.Chatooly.animationMediaRecorder) {
+    const originalBeginRecording = window.Chatooly.animationMediaRecorder.beginRecording;
+
+    window.Chatooly.animationMediaRecorder.beginRecording = function(duration) {
+        console.log('🎬 Video export starting - resetting entrance animation');
+
+        // Reset entrance animation state
+        resetEntranceAnimation();
+
+        // Ensure animation is playing
+        if (!isPlaying) {
+            isPlaying = true;
+            animate();
+        }
+
+        // Call original recording function
+        originalBeginRecording.call(this, duration);
+    };
+
+    console.log('✅ Video export hook installed - entrance animation will restart on export');
+} else {
+    // If CDN not loaded yet, wait for it
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if (window.Chatooly && window.Chatooly.animationMediaRecorder) {
+                const originalBeginRecording = window.Chatooly.animationMediaRecorder.beginRecording;
+
+                window.Chatooly.animationMediaRecorder.beginRecording = function(duration) {
+                    console.log('🎬 Video export starting - resetting entrance animation');
+
+                    // Reset entrance animation state
+                    resetEntranceAnimation();
+
+                    // Ensure animation is playing
+                    if (!isPlaying) {
+                        isPlaying = true;
+                        animate();
+                    }
+
+                    // Call original recording function
+                    originalBeginRecording.call(this, duration);
+                };
+
+                console.log('✅ Video export hook installed - entrance animation will restart on export');
+            }
+        }, 1000); // Wait 1s for CDN to initialize
+    });
+}
